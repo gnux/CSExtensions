@@ -30,8 +30,7 @@ namespace gnux.Extensions.extEnums
         {
             List<string> list = val.GetDescriptionStringsList() as List<string>;
             string[] attributes = new string[list.Count];
-            for (int i = 0; i < list.Count; ++i)
-                attributes[i] = list[i] as string;
+            list.CopyTo(attributes);
             return attributes;
         }
 
@@ -42,7 +41,7 @@ namespace gnux.Extensions.extEnums
         /// <returns></returns>
         public static IList<string> GetDescriptionStringsList(this Enum val)
         {
-            List<string> list = new List<string>();
+            IList<string> list = new List<string>();
             foreach (FieldInfo field in val.GetType().GetFields())
             {
                 DescriptionAttribute[] attributes = field.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
@@ -69,6 +68,45 @@ namespace gnux.Extensions.extEnums
                         return field.GetValue(val) as Enum;
             }
             return null;
+        }
+
+        ///<summary>
+        /// Get selected values in current Enumeration as their decscription string
+        /// </summary>
+        /// <remarks>Enum must look like follows
+        /// /// <example>enum TEST
+        ///{
+        /// none=0,
+        /// [Description("first Value")]
+        /// first=1,
+        /// [Description("second Value")]
+        /// second=2,
+        /// [Description("third Value")]
+        /// third=4,
+        /// [Description("fourth Value")]
+        /// fourth=8,
+        /// [Description("fifth Value")]
+        /// fifth=16,
+        /// [Description("sixth Value")]
+        /// sixth=32
+        /// }</example>
+        /// </remarks>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static string[] GetSelectedValuesAsDescriptions(this Enum val)
+        {
+            string[] str = new string[0];
+            if ((int)(object)val != 0)
+            {
+                foreach (string desc in val.GetDescriptionStrings())
+                    if ((int)(object)val.FromDescriptionString(desc, true) != 0)
+                        if (((int)(object)val & (int)(object)val.FromDescriptionString(desc, true)) == (int)(object)val.FromDescriptionString(desc, true))
+                        {
+                            Array.Resize<string>(ref str, str.Length + 1);
+                            str[str.Length - 1] = desc;
+                        }
+            }
+            return str;
         }
     }
 }
