@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="extEnums\EnumExtensions.cs" />
+    <Compile Include="Interfaces\IXmlNodeSerializable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
